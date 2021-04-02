@@ -7,7 +7,7 @@ class CatsController < ApplicationController
 
   def create
     cat = Cat.create(cat_params)
-    render json: cat
+    (cat.valid?) ? (render json: cat) : (render json: cat.errors, status: :unprocessable_entity)
   end
 
   private
