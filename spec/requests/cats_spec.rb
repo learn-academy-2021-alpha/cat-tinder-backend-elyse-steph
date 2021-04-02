@@ -55,4 +55,31 @@ RSpec.describe "Cats", type: :request do
     json = JSON.parse(response.body)
     expect(json["name"]).to include "can't be blank" 
   end
+
+  describe 'PUT /cats/:id' do
+    it "updates a cat" do
+      #arrange
+      cat_params = {
+        cat: {
+          name:'Arlo',
+          age: 20,
+          enjoys:'chasing after many birds'
+        }
+      }
+
+      #act
+      put '/cats/:id', params: cat_params
+
+      #assert
+      cat = Cat.first
+      expect(cat.name).to eq 'Arlo'
+      expect(cat.age).to eq 20
+      expect(cat.enjoys).to eq 'chasing after many birds'
+
+      cat_response = JSON.parse(response.body)
+      expect(cat_response['name']).to eq 'Arlo'
+      expect(cat_response['age']).to eq 20
+      expect(cat_response['enjoys']).to eq 'chasing after many birds'
+    end
+  end 
 end
