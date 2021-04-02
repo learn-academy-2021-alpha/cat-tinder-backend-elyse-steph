@@ -39,7 +39,6 @@ RSpec.describe "Cats", type: :request do
       expect(cat_response['age']).to eq 54
       expect(cat_response['enjoys']).to eq 'mentoring Mowgli'
     end
-  end
 
   it "Doesn't create a cat without a name" do
     cat_params = {
@@ -50,9 +49,48 @@ RSpec.describe "Cats", type: :request do
     }
 
     post "/cats", params: cat_params
-    
+
     expect(response.status).to eq 422
     json = JSON.parse(response.body)
-    expect(json["name"]).to include "can't be blank" 
+    expect(json["name"]).to include "can't be blank"
+  end
+end
+
+  describe 'PUT /cats/' do
+    it "updates a cat" do
+      cat = Cat.create name: 'Garfield', age: 1, enjoys: 'eating lasagna'
+      update_cat_params = {
+        cat: {
+          name:'Arlo',
+          age: 20,
+          enjoys:'chasing after many birds'
+        }
+      }
+      put "/cats/#{cat.id}", params: update_cat_params
+
+      update_cat_response = JSON.parse(response.body)
+      expect(update_cat_response['name']).to eq 'Arlo'
+      expect(update_cat_response['age']).to eq 20
+      expect(update_cat_response['enjoys']).to eq 'chasing after many birds'
+      expect(response).to have_http_status(200)
+
+    end
+  end
+
+  describe 'DELETE /cats/' do
+    it "deletes a cat" do
+      cat = Cat.create name: 'Garfield', age: 1, enjoys: 'eating lasagna'
+
+      delete "/cats/#{cat.id}"
+
+      no_cat = Cat.where(id: cat.id)
+      expect(no_cat).to be_empty
+
+      delete_cat_response = JSON.parse(response.body)
+      expect(delete_cat_response['name']).to eq 'Garfield'
+      expect(delete_cat_response['age']).to eq 1
+      expect(delete_cat_response['enjoys']).to eq 'eating lasagna'
+      expect(response).to have_http_status(200)
+    end
   end
 end
